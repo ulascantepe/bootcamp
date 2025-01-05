@@ -1,0 +1,87 @@
+class Market:
+    def __init__(self):
+        self.file_name = "product.txt"
+        try:
+            self.file = open(self.file_name, "r")
+        except FileNotFoundError:
+            self.file = open(self.file_name, "w")
+            print(f"'{self.file_name}' dosyası oluşturuldu.")
+        self.file.close()
+    def __del__(self):
+        self.file.close()
+        print(f"'{self.file_name}' dosyası kapatıldı.")
+    def list_products(self):
+        self.file = open(self.file_name, "r")
+        products = self.file.readlines()
+        self.file.close()
+        if not products:
+            print("Henüz hiç ürün eklenmemiş.")
+        else:
+            print("Ürün Listesi:")
+            for product in products:
+                name, category, price, stock = product.strip().split(",")
+                print(f"Ürün Adı: {name}, Kategori: {category}, Fiyat: {price} TL, Stok: {stock} adet")
+    def add_product(self):
+        name = input("Ürün adı: ")
+        category = input("Kategori: ")
+        price = input("Fiyat (TL): ")
+        stock = input("Stok miktarı: ")
+        new_product = f"{name},{category},{price},{stock}\n"
+        self.file = open(self.file_name, "a")
+        self.file.write(new_product)
+        self.file.close()
+        print(f"'{name}' adlı ürün eklendi.")
+    def delete_product(self):
+        self.file = open(self.file_name, "r")
+        products = self.file.readlines()
+        self.file.close()
+
+        if not products:
+            print("Henüz hiç ürün eklenmemiş.")
+            return
+
+        print("Ürün Listesi:")
+        for i, product in enumerate(products):
+            name, category, price, stock = product.strip().split(",")
+            print(f"{i+1}. Ürün Adı: {name}, Kategori: {category}, Fiyat: {price} TL, Stok: {stock} adet")
+
+        index = int(input("Silmek istediğiniz ürünün numarasını girin: "))
+        if index < 1 or index > len(products):
+            print("Geçersiz ürün numarası.")
+            return
+
+        deleted_product = products.pop(index-1)
+        name, _, _, _ = deleted_product.strip().split(",")
+
+        self.file = open(self.file_name, "w")
+        self.file.writelines(products)
+        self.file.close()
+
+        print(f"'{name}' adlı ürün silindi.")
+
+def main():
+    markets = Market()
+
+    while True:
+        print("\n*** MENÜ ***")
+        print("1) Ürünleri Listele")
+        print("2) Ürün Ekle")
+        print("3) Ürün Sil")
+        print("4) Çıkış")
+
+        choice = input("Seçiminiz (1-4): ")
+
+        if choice == "1":
+            markets.list_products()
+        elif choice == "2":
+            markets.add_product()
+        elif choice == "3":
+            markets.delete_product()
+        elif choice == "4":
+            print("Çıkış yapılıyor...")
+            break
+        else:
+            print("Geçersiz seçim. Lütfen tekrar deneyin.")
+
+if __name__ == "__main__":
+    main()
